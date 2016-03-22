@@ -5,17 +5,21 @@ def md5(s: String) = {
   MessageDigest.getInstance("MD5").digest(s.getBytes).map("%02x".format(_)).mkString
 }
 
+def lineOfZeros(i: Int): String = {
+  "0"*i
+}
+
 @tailrec
-def recursiveScan(s: String, num: Int): Int = {
-  val firstFiveNumbersHash = md5(s + num).take(5)
-  val temp = firstFiveNumbersHash == "00000"
+def recursiveScan(s: String, num: Int, zeros: Int): Int = {
+  val firstFiveNumbersHash = md5(s + num).take(zeros)
+  val temp = firstFiveNumbersHash == lineOfZeros(zeros)
   
   temp match {
     case true => num
-    case false => recursiveScan(s,num+1)
+    case false => recursiveScan(s, num+1, zeros)
   }
 }
 
-
 val input = "ckczppom"
-val output = recursiveScan(input, 0)
+val output1 = recursiveScan(input, 0, 5)
+val output2 = recursiveScan(input, 0, 6)

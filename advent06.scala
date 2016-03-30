@@ -31,6 +31,7 @@ def update(Grid: Array[Array[Boolean]], coords: Array[Array[Int]], exe: String):
   Grid
 }
 
+// First star
 val input = scala.io.Source.fromFile("advent06.txt").mkString.split("\n")
 val Grid = Array.fill(1000, 1000)(false)
 for (line <- input) {
@@ -39,3 +40,26 @@ for (line <- input) {
   update(Grid, coords, cmd.exe)
 }
 val r1 = Grid.flatten.filter(identity).size
+
+// Second star
+def update2(Grid: Array[Array[Int]], coords: Array[Array[Int]], exe: String): Array[Array[Int]] = {
+  for (x <- coords(0); y <- coords(1)) {
+    var inc = 0
+    exe match {
+      case "toggle" => inc = 2
+      case "turn off" => if (Grid(x)(y) > 0) inc = -1 else inc = 0
+      case "turn on" => inc = 1
+      case _ => println("Unknown command: " + exe)
+    }
+    Grid(x)(y) = Grid(x)(y) + inc
+  }
+  Grid
+}
+
+val Grid = Array.fill(1000, 1000)(0)
+for (line <- input) {
+  val cmd = getCommand(line)
+  val coords = through(cmd.start, cmd.end)
+  update2(Grid, coords, cmd.exe)
+}
+val r2 = Grid.flatten.sum

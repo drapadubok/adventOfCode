@@ -41,3 +41,6 @@ def solve(out: String): Int = {
 }
 
 solve("a")
+// part 2
+resultDict = Map("b" -> solve("a"))
+solve("a")

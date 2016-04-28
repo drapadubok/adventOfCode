@@ -1,4 +1,3 @@
-
 val input = scala.io.Source.fromFile("/m/nbe/home/smirnod1/advent09.txt").mkString.split("\n")
 
 // Extract only needed data: Array(from, to, distance)
@@ -26,29 +25,38 @@ def permuteRange(n: Int): Array[Int] = scala.util.Random.shuffle(0 to n-1).toArr
 // We're data scientists here, so instead of solving TSP, I'm going with Monte-Carlo approach
 // Generate multiple permutations of possible routes, check distance, and return the shortest
 // While not guaranteed to be the best, at least guaranteed to NOT be the worst
-def calculateRouteAndDistance(nperm: Int, ndim: Int): Array[Any] = {
+def calculateDistance(nperm: Int, ndim: Int, initdist: Int, cmpfun: (Int,Int) => Boolean): Int = {
   var c = 0
-  var dist = 99999
+  var dist = initdist
 
   while (c < nperm) {
     val route = permuteRange(ndim)
     val routeDist = route.sliding(2).toArray.map { i =>
-      // If 0, look at other triangle
+      // We only filled in upper triangle, so we need to check if value is 0
+      // If it is, then just look in another triangle
       if (AdjacencyMatrix(i(0))(i(1)) == 0) {
         AdjacencyMatrix(i(1))(i(0))
       } else {
         AdjacencyMatrix(i(0))(i(1))
       }
     }
-    if (routeDist.sum < dist) {
+
+    if (cmpfun(routeDist.sum, dist)) {
       dist = routeDist.sum
-      val returnRoute = route
     }
     c += 1
   }
-  Array(dist, returnRoute)
+  dist
 }
 
 val nperm = 1000000
-val w = calculateRouteAndDistance(nperm, ndim)
-val r1 = w(0)
+
+// first star
+def cmpfunBgtA(a: Int, b: Int): Boolean = a < b
+val initdist = 9999
+val w = calculateDistance(nperm, ndim, initdist, cmpfunBgtA)
+
+// second star
+def cmpfunAgtB(a: Int, b: Int): Boolean = a > b
+val initdist = 0
+val w = calculateDistance(nperm, ndim, initdist, cmpfunAgtB)
